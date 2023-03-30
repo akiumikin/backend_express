@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  express:
+    image: node:18.15.0
+    restart: always
+    container_name: express
+    tty: true
+    stdin_open: true
+    environment:
+      DEBUG: express:*
+    ports:
+      - 3100:3100
+    volumes:
+      - .:/app
+      - root-data:/root # .bash_profileなどを永続化
+      - bin-data:/usr/local/bin/
+    working_dir: /app
+    networks: # nginxを基準にcontainerとネットワーク共有
+      nginx_default:
+    command: bash -c 'npm i -g nodemon && nodemon index.ts'
+
+volumes:
+  root-data:
+    driver: local
+  bin-data:
+    driver: local
+
+networks:
+  nginx_default:
+    external: true
