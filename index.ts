@@ -3,21 +3,32 @@ const app: express.Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-//CROS対応（というか完全無防備：本番環境ではだめ絶対）
-app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "*")
-  res.header("Access-Control-Allow-Headers", "*");
-  next();
-})
-
+// portのlistenの設定、起動時処理を含む
 app.listen(3100, () => {
   console.log("Start on port 3100.")
 })
 
+///////////////////////////////////////////////
+//
+// controllers
+//
+///////////////////////////////////////////////
+const requestConsoleInfo = (req: express.Request) => {
+  const log = {
+    url: req.url,
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+    route: req.route,
+  }
+
+  console.info(log)
+}
+
 app.get('/express/system_info', (req: express.Request, res: express.Response) => {
-  // console.log(req)
-  debugger
+  requestConsoleInfo(req)
 
   const info = {
     language: 'typescript',

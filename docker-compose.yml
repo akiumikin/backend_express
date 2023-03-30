@@ -6,8 +6,8 @@ services:
     container_name: express
     tty: true
     stdin_open: true
-    environment:
-      DEBUG: express:*
+    # environment:
+    #   DEBUG: express:*
     ports:
       - 3100:3100
     volumes:
