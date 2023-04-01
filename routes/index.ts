@@ -1,30 +1,10 @@
 import express from 'express'
+import pool from './../lib/dbAdapter'
+import { Pool, PoolClient } from 'pg'
+
 const router = express.Router();
 
-///////////////////////////////////////////////
-//
-// database
-// https://node-postgres.com
-//
-///////////////////////////////////////////////
-import { Pool } from 'pg'
-
-const pool = new Pool({
-  host: 'postgres',
-  port: 5432,
-  user: 'info',
-  database: 'myapp',
-  password: 'password',
-})
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.send(JSON.stringify({test: 1}));
-});
-
 router.get('/system_info', (req: express.Request, res: express.Response) => {
-  // requestConsoleInfo(req)
-
   const info = {
     language: 'typescript',
     language_version: '5.0.2',
@@ -32,7 +12,22 @@ router.get('/system_info', (req: express.Request, res: express.Response) => {
     framework_version: '4.18.2'
   }
 
-  res.send(JSON.stringify(info))
+  res.status(200).json(info)
+})
+
+router.get('/db_status', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const dbClient = await pool.connect()
+
+  try {
+    const result = await dbClient.query('SELECT NOW() as now')
+    console.log(result)
+    res.status(200).json({status: !!result.rows})
+  } catch (err) {
+    console.error(err)
+    next(err)
+  } finally {
+    dbClient.release()
+  }
 })
 
 export default router
