@@ -1,4 +1,5 @@
 import express from 'express'
+
 const app: express.Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -6,6 +7,22 @@ app.use(express.urlencoded({ extended: true }))
 // portのlistenの設定、起動時処理を含む
 app.listen(3100, () => {
   console.log("Start on port 3100.")
+})
+
+///////////////////////////////////////////////
+//
+// database
+// https://node-postgres.com
+//
+///////////////////////////////////////////////
+import { Pool } from 'pg'
+
+const pool = new Pool({
+  host: 'postgres',
+  port: 5432,
+  user: 'info',
+  database: 'myapp',
+  password: 'password',
 })
 
 ///////////////////////////////////////////////
@@ -26,6 +43,21 @@ const requestConsoleInfo = (req: express.Request) => {
 
   console.info(log)
 }
+
+app.get('/express/db_status', async (req: express.Request, res: express.Response) => {
+  requestConsoleInfo(req)
+  const client = await pool.connect()
+
+  try {
+    const result = await client.query('SELECT NOW() as now')
+    res.send({status: true})
+  } catch (err) {
+    console.error(err)
+    res.send({status: false})
+  } finally {
+    client.release()
+  }
+})
 
 app.get('/express/system_info', (req: express.Request, res: express.Response) => {
   requestConsoleInfo(req)
