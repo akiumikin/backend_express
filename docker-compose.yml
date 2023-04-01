@@ -17,7 +17,7 @@ services:
     working_dir: /app
     networks: # nginxを基準にcontainerとネットワーク共有
       nginx_default:
-    command: bash -c 'npm i -g nodemon && nodemon index.ts'
+    command: bash -c 'npm i -g nodemon && npm i && nodemon app.ts'
 
 volumes:
   root-data:
